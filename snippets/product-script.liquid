@@ -7,6 +7,15 @@
               images = fotoramaElement.children().clone(),
               startIndex = 0;         
           $("[data-js-gallery]").click(function () {
+            if(!fotoramaElement.hasClass('init')){
+                fotoramaElement.children().each(function() {
+                    let lazy = $(this).data('src');
+                    if(lazy){
+                        $(this).attr('src', lazy);
+                    }
+                });
+                fotoramaElement.addClass('init');
+            }
             var currentSlide = slideMain.find('.slick-current');
             if(currentSlide.length){
                 var imageId  = currentSlide.data('image-id');
