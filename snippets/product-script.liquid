@@ -26,7 +26,7 @@
                     }
                 });
             }
-            fotorama = fotoramaElement.fotorama({allowfullscreen: true, nav: 'thumbs'}).data('fotorama');
+            var fotorama = fotoramaElement.fotorama({allowfullscreen: true, nav: 'thumbs'}).data('fotorama');
             fotorama.show({index: startIndex, time: 0});
             fotorama.requestFullScreen();
           });
