@@ -3092,47 +3092,42 @@ $(function ($) {
                                 slideMain.slick('slickGoTo', idx);
                             }
                         });
-                        $quickView.find("[data-js-gallery]").click(function () {
-                            $script([cms_js.data('fotorama')], function () {
-                                var fotoramaElement = $quickView.find('div[data-fotorama]'),
-                                    images = fotoramaElement.children().clone(),
-                                    startIndex = 0;         
-                                $("[data-js-gallery]").click(function () {
-                                    if(!fotoramaElement.hasClass('init')){
-                                        fotoramaElement.children().each(function() {
-                                            let lazy = $(this).data('src');
-                                            if(lazy){
-                                                $(this).attr('src', lazy);
-                                            }
-                                        });
-                                        fotoramaElement.addClass('init');
-                                    }
-                                    var currentSlide = slideMain.find('.slick-current');
-                                    if(currentSlide.length){
-                                        var imageId  = currentSlide.data('image-id');
-                                        images.each(function( index ) {
-                                            if($(this).data('image-id') == imageId){
-                                                startIndex = index;
-                                                return false;
-                                            }
-                                        });
-                                    }
-                                    var fotorama = fotoramaElement.fotorama({allowfullscreen: true, nav: 'thumbs'}).data('fotorama');
-                                    if(fotorama){
-                                        fotorama.show({index: startIndex, time: 0});
-                                        fotorama.requestFullScreen();
-                                    }
-                                });
-                                $('div[data-fotorama]').on('click', function (e, fotorama) {
-                                    if ($(e.target).hasClass("fotorama__stage__frame")) {
-                                        $('div[data-fotorama]').data('fotorama').cancelFullScreen();
-                                        $('div[data-slide-nav]').find(".slick-track").css("transform", "none");
-                                    }
-                                });
+                        $script([cms_js.data('fotorama')], function () {
+                            var fotoramaElement = $quickView.find('div[data-fotorama]'),
+                                images = fotoramaElement.children().clone(),
+                                startIndex = 0;         
+                            $("[data-js-gallery]").click(function () {
+                                if(!fotoramaElement.hasClass('init')){
+                                    fotoramaElement.children().each(function() {
+                                        let lazy = $(this).data('src');
+                                        if(lazy){
+                                            $(this).attr('src', lazy);
+                                        }
+                                    });
+                                    fotoramaElement.addClass('init');
+                                }
+                                var currentSlide = slideMain.find('.slick-current');
+                                if(currentSlide.length){
+                                    var imageId  = currentSlide.data('image-id');
+                                    images.each(function( index ) {
+                                        if($(this).data('image-id') == imageId){
+                                            startIndex = index;
+                                            return false;
+                                        }
+                                    });
+                                }
+                                var fotorama = fotoramaElement.fotorama({allowfullscreen: true, nav: 'thumbs'}).data('fotorama');
+                                fotorama.show({index: startIndex, time: 0});
+                                fotorama.requestFullScreen();
+                            });
+                            $quickView.find('div[data-fotorama]').on('click', function (e, fotorama) {
+                                if ($(e.target).hasClass("fotorama__stage__frame")) {
+                                    $('div[data-fotorama]').data('fotorama').cancelFullScreen();
+                                    $('div[data-slide-nav]').find(".slick-track").css("transform", "none");
+                                }
                             });
                         });
-
-                        $("#quick-view-modal").find('[data-page-open-popup]').magnificPopup({
+                        $quickView.find('[data-page-open-popup]').magnificPopup({
                             callbacks: {
                                 beforeOpen: function() {
                                     this.st.mainClass = this.st.el.attr('data-effect');
