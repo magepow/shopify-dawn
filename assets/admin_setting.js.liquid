@@ -53,6 +53,14 @@ $(document).on('shopify:block:select', function(event){
       blockId   = event.detail.blockId,
       $shopifySection = $(shopifySelector + sectionId);
 
+  if ($shopifySection.hasClass('slideshow')) {
+      if ($('#laber_' + blockId).length) {
+          var slideIndex = $('#laber_' + blockId).closest(".wrap_slide").attr("data-slick-index");
+      } else {
+          var slideIndex = $('#b_' + blockId).closest('.js_image_slide').attr("data-slick-index");
+      }
+      $shopifySection.find('.js_carousel').slick("slickGoTo", parseInt(slideIndex));
+  }
   if (sectionId == "vertical_menu" ) {
     $('.lazy_vertical_menu').html($('#html_vertical_menu').html());
     $('.vertical_menu').addClass('open_sub');
