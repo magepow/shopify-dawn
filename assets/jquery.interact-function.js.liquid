@@ -2744,7 +2744,7 @@ $(function ($) {
                             $this.removeClass('ajax_loading');
                             $this.addClass('added').find('.text').text("{{'products.product.add_to_cart_pr.added' | t }}");
                             $('.js_add_to_cart_button').removeAttr("disabled").css('pointer-events', 'auto');
-                            $(document).trigger('ajax:addToCart', {
+                            $('body').trigger('ajax:addToCart', {
                                 'form': $form,
                                 'response': response
                             });
