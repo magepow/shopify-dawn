@@ -1211,8 +1211,8 @@ Alothemes.ProductGallery = function () {
             });
             slideNav.on('click', '[data-thumb-id]', function () {
                 if(!slideMain.length) return;
-                var thumbId = $(this).data('thumb-id'),
-                    img     = slideMain.find('.js-image-' + thumbId),
+                var imgId = $(this).data('thumb-id'),
+                    img     = slideMain.find('[data-image-id="' + imgId + '"] img'),
                     idx     = img.closest('.slick-slide').data('slick-index');
                 slideMain.addClass('is-nav-trigger').slick('slickGoTo', idx);
                 $(this).addClass('slick-current').siblings().removeClass('slick-current');
