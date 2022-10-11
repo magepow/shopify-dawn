@@ -1139,11 +1139,11 @@ Alothemes.ProductGallery = function () {
             }, slideMain.data()));
             slideMain.on('init afterChange', function (event, slick, currentSlide, nextSlide) {
                 var slickCurrent = $(slick.$slides.get(currentSlide)),
-                    slickNext    = $(slick.$slides.get(nextSlide));
+                    slickNext    = $(slick.$slides.get(nextSlide)),
+                    imageId      = slickCurrent.data('image-id');
                 _.zoomCreate(slickCurrent);
                 if(!slideMain.hasClass('is-nav-trigger') && slideNav.hasClass('slick-initialized')){
-                    var imageId    = slickCurrent.data('image-id'),
-                        img        = slideNav.find('[data-thumb-id="' + imageId + '"]'),
+                    var img        = slideNav.find('[data-thumb-id="' + imageId + '"]'),
                         navCurrent = img.closest('.slick-slide'),
                         idx        = navCurrent.data('slick-index'),
                         slideCount = slideNav.slick('getSlick').slideCount;
@@ -1156,7 +1156,43 @@ Alothemes.ProductGallery = function () {
                         navCurrent.addClass('slick-current').siblings().removeClass('slick-current');
                     }
                 }
+                var disableAutoSwatchMatchImage = ( '{{ settings.product_variant_auto_match_disable }}' == 'true' );
+                if(!disableAutoSwatchMatchImage && !slideMain.hasClass('is-swatch-trigger')){
+                    var $product = $('#product-single');
+                    if($product.length){
+                        var dataJson      = $product.find('.data-json-product'),
+                            json          = dataJson.length ? JSON.parse(dataJson.html()) : $product.data('json-product'),
+                            variants      = json.variants,
+                            options       = $product.find('.cms-option-item'),
+                            currentOption = [];
+                        $.each(options, function () {
+                            var active = $(this).find('.product-options__value.active');
+                            if(active.length){
+                                currentOption.push(active.data('value'));
+                            }
+                        });
+                        currentOption.shift();
+                        var matchOne = [];
+                        $.each(variants, function () {
+                            if(this.featured_image && this.featured_image.id == imageId){
+                                var optionsHandleize = this.options.map(x => Shopify.handleize(x));
+                                optionsHandleize.shift();
+                                var isMatch = (currentOption.join() == optionsHandleize.join());
+                                if(matchOne.length == 0 || isMatch){
+                                    matchOne = this.options;
+                                }
+                                if(isMatch){
+                                    return false;
+                                }
+                            }
+                        });
+                        $.each(matchOne, function (index, value) {
+                            options.eq(index).find('[data-value="' + Shopify.handleize(value) + '"]').trigger('click');
+                        });
+                    }
+                }
                 slideMain.removeClass('is-nav-trigger');
+                slideMain.removeClass('is-swatch-trigger');
             });
             slideMain.slick(slideMain.data());
             $('body').on('afterVariantUpdated', function (e, $variant) {
@@ -1165,6 +1201,7 @@ Alothemes.ProductGallery = function () {
                     var img  = slideMain.find('.js-image-' + featuredImage.id),
                         idx = img.closest('.slick-slide').data('slick-index');
                     slideMain.slick('slickGoTo', idx);
+                    slideMain.addClass('is-swatch-trigger');
                 }
             });
             if(!slideNav.length) return;
@@ -2088,10 +2125,7 @@ Alothemes.countUpAndNumberProcess = function () {
     if(count.length){
         $script([cms_js.data('counterup')], function(){
             setTimeout(function(){
-              $('.number-count').countUp({
-                'time': 1500,
-                'delay': 10
-              });           
+              $('.number-count').counterUp();           
             }, 10);
         });  
     }
@@ -2486,7 +2520,7 @@ $(function ($) {
                     }
                 });
                 $(document).on('click', '.back-to-top', function () {
-                    $('html, body').animate({ scrollTop: 0 }, 800);
+                    $('html, body').animate({ scrollTop: 0 }, 0);
                     return false;
                 });
             },
@@ -2703,9 +2737,6 @@ $(function ($) {
                         } else if (currentVal > 0) {
                             $qty.val(currentVal - parseFloat(step));
                         }
-                    }
-                    if ($qty.val() < 10) {
-                        $qty.val("0" + $qty.val());
                     }
                     $qty.trigger('change');
                 });
@@ -3540,7 +3571,13 @@ $(function ($) {
 {%- endcapture -%}
 {%- if productionMode -%}
     {%- assign paragraphs = scriptJs | newline_to_br | split: '<br />' -%}
-    {%- for paragraph in paragraphs %}{{-  paragraph | strip -}} {% endfor -%}
+    {%- for paragraph in paragraphs -%}
+      {%- assign paragraph = paragraph| strip -%}
+      {%- assign comment = paragraph | strip | slice: 0, 2 -%}
+      {%- if comment != '//' -%}
+        {{- paragraph | strip | append: ' ' -}}
+      {%- endif -%}
+    {%- endfor -%}
 {%- else -%}
     {{ scriptJs }}
 {%- endif -%}
