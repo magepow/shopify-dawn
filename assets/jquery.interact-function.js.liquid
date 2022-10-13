@@ -2627,6 +2627,7 @@ $(function ($) {
                     ld_bar = $('.ld_bar_search');
                     skeleto = $('.skeleton_js');
                     val_currect = _this.val();
+                    (val_currect != "") ? $('.search_header__prs>.keywords').html(val_currect).parents('.search_header__prs').show() : $('.search_header__prs').hide();
                     if ((val_old == val_currect || val_currect == "") && bl != '1') return;
                     ld_bar.addClass('on_star');
                     $result.hide();
