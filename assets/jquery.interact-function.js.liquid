@@ -488,7 +488,7 @@ Alothemes.ProductOptions = function () {
                     });
                 });
             });
-            $('.js_product_single .product-options__value').each(function () {
+            $('.js_product_single .product-options__value, .sticky_variant_content .product-options__value').each(function () {
                 if ($(this).hasClass('active')) {
                     $(this).closest(".cms-option-item").find('.label-selected').html($(this).data('value'));
                 }
@@ -2651,8 +2651,8 @@ $(function ($) {
                             data: data + slug_js,
                             success: function (result) {
                                 var arr = result.split('||');
-                                $('.search_header__prs>span').html("{{ 'general.search.results' | t }}");
-                                $('.search_header__prs>span').hide();
+                                $('.search_header__prs .h_results').html("{{ 'general.search.results' | t }}");
+                                $('.search_header__prs .h_results').hide();
                                 $(arr[0]).show();
                                 $result.html(arr[1]);
                                 val_old = val_currect;
