@@ -344,6 +344,61 @@ Alothemes.SortingCollections = function () {
 
     theme.SortingCollections = new SortingCollections('.type_tab_collection');
 }();
+Alothemes.ProductCurrency = function () {
+
+    function ProductCurrency() {
+        this.selectors = {
+            multipleCurrencies: "{{ settings.show_multiple_currencies }}"
+        };
+        this.load();
+    };
+
+    ProductCurrency.prototype = $.extend({}, ProductCurrency.prototype, {
+        load: function () {
+            var _ = this;
+            $('body').on('contentUpdated', function () {
+               _.update();
+            });
+        },
+        setPrice: function ($price, price, compare_at_price) {
+            var cookieCurrency;
+            try {
+                cookieCurrency = Currency.cookie.read();
+            } catch (err) { }
+            price = +price;
+            compare_at_price = +compare_at_price;
+            var html = '',
+                sale = compare_at_price && compare_at_price > price;
+            $price[sale ? 'addClass' : 'removeClass']('price--sale');
+            html += Shopify.formatMoney(price, theme.moneyFormat);
+            if (sale) {
+                html += '<span class="compare">';
+                html += Shopify.formatMoney(compare_at_price, theme.moneyFormat);
+                html += '</span>';
+            }
+            if ($price.closest(".price").find("span:last-child").hasClass("compare")) {
+                $price.closest(".price").find("span:last-child").hide();
+            }
+            $price.html(html);
+        },
+        update: function () {
+            var cookieCurrency;
+            try {
+                cookieCurrency = Currency.cookie.read();
+            } catch (err) { }
+            if ($(".currency-picker__label").length) {
+                var moneyFormat = $("span[data-shop-currency]").attr("data-shop-currency");
+            } else {
+                var moneyFormat = Currency.currentCurrency;
+            }
+            if (this.selectors.multipleCurrencies && cookieCurrency != null) {
+                Currency.convertAll(moneyFormat, cookieCurrency);
+            }
+        }
+    });
+
+    return new ProductCurrency();
+}();
 Alothemes.ProductOptions = function () {
 
     function ProductOptions() {
@@ -1379,61 +1434,6 @@ Alothemes.ProductGallery = function () {
     });
 
     return new ProductGallery();
-}();
-Alothemes.ProductCurrency = function () {
-
-    function ProductCurrency() {
-        this.selectors = {
-            multipleCurrencies: "{{ settings.show_multiple_currencies }}"
-        };
-        this.load();
-    };
-
-    ProductCurrency.prototype = $.extend({}, ProductCurrency.prototype, {
-        load: function () {
-            var _ = this;
-            $('body').on('contentUpdated', function () {
-               _.update();
-            });
-        },
-        setPrice: function ($price, price, compare_at_price) {
-            var cookieCurrency;
-            try {
-                cookieCurrency = Currency.cookie.read();
-            } catch (err) { }
-            price = +price;
-            compare_at_price = +compare_at_price;
-            var html = '',
-                sale = compare_at_price && compare_at_price > price;
-            $price[sale ? 'addClass' : 'removeClass']('price--sale');
-            html += Shopify.formatMoney(price, theme.moneyFormat);
-            if (sale) {
-                html += '<span class="compare">';
-                html += Shopify.formatMoney(compare_at_price, theme.moneyFormat);
-                html += '</span>';
-            }
-            if ($price.closest(".price").find("span:last-child").hasClass("compare")) {
-                $price.closest(".price").find("span:last-child").hide();
-            }
-            $price.html(html);
-        },
-        update: function () {
-            var cookieCurrency;
-            try {
-                cookieCurrency = Currency.cookie.read();
-            } catch (err) { }
-            if ($(".currency-picker__label").length) {
-                var moneyFormat = $("span[data-shop-currency]").attr("data-shop-currency");
-            } else {
-                var moneyFormat = Currency.currentCurrency;
-            }
-            if (this.selectors.multipleCurrencies && cookieCurrency != null) {
-                Currency.convertAll(moneyFormat, cookieCurrency);
-            }
-        }
-    });
-
-    return new ProductCurrency();
 }();
 Alothemes.ProductTextCountdown = function () {
     function ProductTextCountdown() {
